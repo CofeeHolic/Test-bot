@@ -11,6 +11,8 @@ This is a trading bot that uses a divergence strategy to trade on the Dhan platf
 3. Set the following environment variables:
    - `DHAN_CLIENT_ID`: Your Dhan client ID.
    - `DHAN_ACCESS_TOKEN`: Your Dhan access token.
+   - `TELEGRAM_BOT_TOKEN` (Optional): Your Telegram bot token for notifications.
+   - `TELEGRAM_CHAT_ID` (Optional): The chat ID to send notifications to.
 
 ## Running the bot
 

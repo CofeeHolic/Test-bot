@@ -7,6 +7,7 @@ from dhanhq import dhanhq
 import time
 from datetime import datetime, timedelta
 import logging
+import telegram
 
 # --- Setup Logging ---
 logging.basicConfig(level=logging.INFO, format='%(asctime)s - %(levelname)s - %(message)s')
@@ -40,6 +41,10 @@ RISK_REWARD_RATIO = 2.0
 # --- DHAN API Credentials ---
 DHAN_CLIENT_ID = os.getenv("DHAN_CLIENT_ID")
 DHAN_ACCESS_TOKEN = os.getenv("DHAN_ACCESS_TOKEN")
+
+# --- Telegram Credentials ---
+TELEGRAM_BOT_TOKEN = os.getenv("TELEGRAM_BOT_TOKEN")
+TELEGRAM_CHAT_ID = os.getenv("TELEGRAM_CHAT_ID")
 
 # --- Global variables ---
 dhan = None
@@ -170,6 +175,16 @@ def calculate_indicators(df):
     df['divergence_high'] = pd.Series(np.where(df['bearish_divergence'], df['High'], np.nan), index=df.index).ffill()
     return df
 
+def send_telegram_message(message):
+    """Sends a message to the configured Telegram chat."""
+    if TELEGRAM_BOT_TOKEN and TELEGRAM_CHAT_ID:
+        try:
+            bot = telegram.Bot(token=TELEGRAM_BOT_TOKEN)
+            bot.send_message(chat_id=TELEGRAM_CHAT_ID, text=message, parse_mode=telegram.ParseMode.MARKDOWN)
+            logging.info("Sent Telegram notification.")
+        except Exception as e:
+            logging.error(f"Failed to send Telegram notification: {e}")
+
 def check_signals_and_trade(ticker, ticker_info, capital):
     if ticker in open_positions:
         logging.info(f"Position already open for {ticker}. Skipping signal check.")
@@ -246,6 +261,18 @@ def check_signals_and_trade(ticker, ticker_info, capital):
                     order_id = order_response['data']['orderId']
                     open_positions[ticker] = {'order_id': order_id, 'type': entry_type}
                     logging.info(f"Successfully placed order for {ticker}, Order ID: {order_id}")
+
+                    # Send Telegram notification
+                    trade_notification_msg = (
+                        f"✅ *New Trade Signal*\n\n"
+                        f"*Ticker:* `{ticker}`\n"
+                        f"*Type:* `{entry_type.upper()}`\n"
+                        f"*Entry Price:* `{entry_price:.2f}`\n"
+                        f"*Stop Loss:* `{stop_loss:.2f}`\n"
+                        f"*Take Profit:* `{take_profit:.2f}`\n"
+                        f"*Quantity:* `{position_size}`"
+                    )
+                    send_telegram_message(trade_notification_msg)
                 else:
                     logging.error(f"Failed to place order for {ticker}.")
 
@@ -270,6 +297,11 @@ def main():
             logging.info("Dhan API client initialized successfully.")
             capital = fund_limits['data']['availabelBalance']
             logging.info(f"Available Balance: {capital}")
+            send_telegram_message(
+                f"🚀 *Dhan Trading Bot Started*\n\n"
+                f"*Mode:* `{'Sandbox' if is_sandbox else 'Live Trading'}`\n"
+                f"*Available Capital:* `{capital:.2f}`"
+            )
         else:
             logging.error(f"Failed to init Dhan API client. Response: {fund_limits}")
             return
@@ -326,9 +358,11 @@ def main():
 
         except KeyboardInterrupt:
             logging.info("Bot stopped by user.")
+            send_telegram_message("🛑 *Dhan Trading Bot Stopped*")
             break
         except Exception as e:
             logging.error(f"An error occurred in the main loop: {e}")
+            send_telegram_message(f"🔥 *Bot Error*\n\n`{e}`")
             time.sleep(60) # Wait a minute before retrying
 
 if __name__ == "__main__":
