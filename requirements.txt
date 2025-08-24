@@ -1,0 +1,5 @@
+dhanhq
+pandas
+pandas-ta
+scipy
+numpy<2.0
