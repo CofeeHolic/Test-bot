@@ -8,6 +8,7 @@ import time
 from datetime import datetime, timedelta
 import logging
 import telegram
+from dotenv import load_dotenv
 
 # --- Setup Logging ---
 logging.basicConfig(level=logging.INFO, format='%(asctime)s - %(levelname)s - %(message)s')
@@ -280,6 +281,8 @@ def check_signals_and_trade(ticker, ticker_info, capital):
                 logging.error(f"Exception when placing order for {ticker}: {e}")
 
 def main():
+    """The main function to run the trading bot."""
+    load_dotenv()
     global dhan
     logging.info("--- Dhan Trading Bot ---")
     if not DHAN_CLIENT_ID or not DHAN_ACCESS_TOKEN:
