@@ -8,7 +8,6 @@ import time
 from datetime import datetime, timedelta
 import logging
 import telegram
-from dotenv import load_dotenv
 
 # --- Setup Logging ---
 logging.basicConfig(level=logging.INFO, format='%(asctime)s - %(levelname)s - %(message)s')
@@ -39,13 +38,14 @@ VOLUME_MULTIPLIER = 1.2
 DIVERGENCE_ORDER = 3
 RISK_REWARD_RATIO = 2.0
 
-# --- DHAN API Credentials ---
-DHAN_CLIENT_ID = os.getenv("DHAN_CLIENT_ID")
-DHAN_ACCESS_TOKEN = os.getenv("DHAN_ACCESS_TOKEN")
+# --- Credentials ---
+# IMPORTANT: For sandbox simulation, paste your credentials directly here.
+DHAN_CLIENT_ID = "YOUR_CLIENT_ID_HERE"
+DHAN_ACCESS_TOKEN = "YOUR_ACCESS_TOKEN_HERE"
 
-# --- Telegram Credentials ---
-TELEGRAM_BOT_TOKEN = os.getenv("TELEGRAM_BOT_TOKEN")
-TELEGRAM_CHAT_ID = os.getenv("TELEGRAM_CHAT_ID")
+# Optional: For Telegram notifications
+TELEGRAM_BOT_TOKEN = "YOUR_TELEGRAM_BOT_TOKEN_HERE"
+TELEGRAM_CHAT_ID = "YOUR_TELEGRAM_CHAT_ID_HERE"
 
 # --- Global variables ---
 dhan = None
@@ -178,7 +178,7 @@ def calculate_indicators(df):
 
 def send_telegram_message(message):
     """Sends a message to the configured Telegram chat."""
-    if TELEGRAM_BOT_TOKEN and TELEGRAM_CHAT_ID:
+    if TELEGRAM_BOT_TOKEN and TELEGRAM_CHAT_ID and "YOUR_TELEGRAM" not in TELEGRAM_BOT_TOKEN:
         try:
             bot = telegram.Bot(token=TELEGRAM_BOT_TOKEN)
             bot.send_message(chat_id=TELEGRAM_CHAT_ID, text=message, parse_mode=telegram.ParseMode.MARKDOWN)
@@ -282,11 +282,10 @@ def check_signals_and_trade(ticker, ticker_info, capital):
 
 def main():
     """The main function to run the trading bot."""
-    load_dotenv()
     global dhan
     logging.info("--- Dhan Trading Bot ---")
-    if not DHAN_CLIENT_ID or not DHAN_ACCESS_TOKEN:
-        logging.critical("FATAL: DHAN_CLIENT_ID and DHAN_ACCESS_TOKEN must be set.")
+    if "YOUR_CLIENT_ID" in DHAN_CLIENT_ID or "YOUR_ACCESS_TOKEN" in DHAN_ACCESS_TOKEN:
+        logging.critical("FATAL: Please replace the placeholder credentials in main.py.")
         return
 
     is_sandbox = True

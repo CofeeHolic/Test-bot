@@ -9,20 +9,17 @@ This is a trading bot that uses a divergence strategy to trade on the Dhan platf
 1. Clone the repository.
 2. Install the dependencies: `pip install -r requirements.txt`
 3. **Configure your credentials**:
-   Create a file named `.env` in the project's root directory. A template is provided in `.env.example`. You can copy it to start:
-   ```bash
-   cp .env.example .env
-   ```
-   Now, edit the `.env` file with your credentials:
-   ```env
-   DHAN_CLIENT_ID="YOUR_DHAN_CLIENT_ID"
-   DHAN_ACCESS_TOKEN="YOUR_DHAN_ACCESS_TOKEN"
+   Open the `main.py` file and locate the "Credentials" section near the top. Paste your sandbox credentials directly into the placeholder variables:
+   ```python
+   # --- Credentials ---
+   # IMPORTANT: For sandbox simulation, paste your credentials directly here.
+   DHAN_CLIENT_ID = "YOUR_CLIENT_ID_HERE"
+   DHAN_ACCESS_TOKEN = "YOUR_ACCESS_TOKEN_HERE"
 
    # Optional: For Telegram notifications
-   TELEGRAM_BOT_TOKEN="YOUR_TELEGRAM_BOT_TOKEN"
-   TELEGRAM_CHAT_ID="YOUR_TELEGRAM_CHAT_ID"
+   TELEGRAM_BOT_TOKEN = "YOUR_TELEGRAM_BOT_TOKEN_HERE"
+   TELEGRAM_CHAT_ID = "YOUR_TELEGRAM_CHAT_ID_HERE"
    ```
-   The bot will automatically load these variables at startup.
 
 ## Running the bot
 
